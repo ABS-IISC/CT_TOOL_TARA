@@ -503,9 +503,9 @@ def generate_contextual_feedback(section_name, content):
                 "id": f"exec_1_{hash(content) % 1000}",
                 "type": "critical",
                 "category": "Initial Assessment",
-                "description": f"Executive summary should clearly state the customer experience (CX) impact. Current content lacks specific mention of how this issue affects customer trust and satisfaction.",
-                "suggestion": "Add a dedicated sentence about CX impact, including potential for negative reviews, returns, or customer complaints",
-                "example": "Example: 'This issue could result in customer dissatisfaction due to [specific impact], potentially affecting trust in our marketplace'",
+                "description": f"Executive summary must explicitly address customer experience (CX) impact per Hawkeye #1. The current content does not clearly articulate how this issue affects customer trust, satisfaction, or marketplace experience. This is a critical gap that needs immediate attention.",
+                "suggestion": "Add a dedicated paragraph addressing CX impact with specific details: 1) Immediate customer harm or confusion, 2) Potential for negative reviews/returns, 3) Long-term trust implications, 4) Steps taken to protect customers",
+                "example": "CX Impact Assessment: This issue directly affects customer trust by [specific mechanism]. Customers may experience [specific problems] leading to potential negative reviews and returns. To protect customers, we have [specific actions taken]. Long-term marketplace integrity requires [preventive measures].",
                 "questions": [
                     "What is the direct impact on customer experience?",
                     "How might this affect customer trust in Amazon?"
@@ -519,9 +519,9 @@ def generate_contextual_feedback(section_name, content):
                 "id": f"exec_2_{hash(content) % 1000}",
                 "type": "important",
                 "category": "Risk Assessment",
-                "description": "Executive summary missing clear risk classification (High/Medium/Low) based on Hawkeye criteria",
-                "suggestion": "Include explicit risk level with justification based on impact severity and scope",
-                "example": "High Risk: Affects customer safety/trust; Medium Risk: Policy violation with pattern; Low Risk: Isolated incident",
+                "description": "Executive summary lacks explicit risk classification using Hawkeye criteria. Without clear risk level designation (High/Medium/Low), stakeholders cannot properly prioritize response and resource allocation. This creates ambiguity in decision-making processes.",
+                "suggestion": "Add risk classification section with: 1) Clear risk level designation, 2) Specific criteria justifying the classification, 3) Impact scope and severity analysis, 4) Comparison to similar cases for consistency",
+                "example": "Risk Classification: HIGH RISK - This issue involves [specific criteria: customer safety/counterfeit/fraud]. Impact scope: [number] customers affected. Severity: [specific harm]. Justification: Meets high-risk criteria due to [detailed reasoning]. Similar cases: [reference examples].",
                 "questions": ["What is the risk level?", "What criteria determine this classification?"],
                 "confidence": 0.88
             })
@@ -533,9 +533,9 @@ def generate_contextual_feedback(section_name, content):
                 "id": f"bg_1_{hash(content) % 1000}",
                 "type": "important",
                 "category": "Investigation Process",
-                "description": "Background section should include timeline of events and initial detection method. Current content may lack chronological clarity.",
-                "suggestion": "Structure background with clear timeline: when issue was detected, by whom, initial scope assessment",
-                "example": "Timeline: Issue detected on [date] via [method], initial scope showed [impact], escalated due to [reason]",
+                "description": "Background section lacks comprehensive timeline and detection methodology required for Hawkeye #2 compliance. Without clear chronological structure and detection details, investigators cannot understand the issue evolution or validate the investigation approach.",
+                "suggestion": "Create detailed background with: 1) Chronological timeline with specific dates/times, 2) Detection method and source, 3) Initial scope assessment with data, 4) Escalation triggers and decision points, 5) Key stakeholders involved at each stage",
+                "example": "Investigation Timeline:\n• [Date/Time]: Issue first detected via [specific method/source]\n• [Date/Time]: Initial assessment revealed [scope/impact with numbers]\n• [Date/Time]: Escalated to [team] due to [specific criteria met]\n• [Date/Time]: Additional evidence gathered showing [findings]\n• Current status: [investigation phase with next steps]",
                 "questions": [
                     "When was this issue first detected?",
                     "What was the detection method?",
@@ -564,9 +564,9 @@ def generate_contextual_feedback(section_name, content):
                 "id": f"rc_1_{hash(content) % 1000}",
                 "type": "critical",
                 "category": "Root Cause Analysis",
-                "description": "Root cause analysis must identify specific process gaps, system failures, or policy ambiguities that allowed this issue to occur",
-                "suggestion": "Use the 5 Whys technique to drill down to fundamental causes. Include both immediate and systemic causes",
-                "example": "Immediate cause: Seller uploaded prohibited item; Systemic cause: Detection algorithm missed specific keyword variations",
+                "description": "Root cause analysis fails to meet Hawkeye #11 standards by not systematically identifying the fundamental failures that enabled this issue. Without proper root cause identification, preventive actions will be ineffective and similar issues will recur.",
+                "suggestion": "Conduct comprehensive root cause analysis using: 1) 5 Whys methodology with documented reasoning, 2) Process gap analysis identifying specific failure points, 3) System limitation assessment, 4) Policy ambiguity review, 5) Human factor analysis, 6) Environmental/contextual factors",
+                "example": "Root Cause Analysis:\n\n5 Whys Analysis:\n1. What: Prohibited item listed → Why: Seller uploaded restricted content\n2. Why: Detection system missed it → Why: Keywords not in algorithm\n3. Why: Algorithm incomplete → Why: Recent policy update not reflected\n4. Why: Update process delayed → Why: No automated sync between policy and detection\n5. Why: Manual process → ROOT CAUSE: Lack of integrated policy-detection system\n\nSystemic Issues: [detailed analysis]\nProcess Gaps: [specific failures]\nRecommendations: [targeted fixes]",
                 "questions": [
                     "What process gap allowed this to happen?",
                     "Are there system limitations that contributed?",
@@ -583,9 +583,9 @@ def generate_contextual_feedback(section_name, content):
                 "id": f"prev_1_{hash(content) % 1000}",
                 "type": "important",
                 "category": "Preventative Actions",
-                "description": "Preventative actions should address both immediate fixes and long-term systemic improvements identified in root cause analysis",
-                "suggestion": "Structure as: Immediate actions (stop current issue), Short-term fixes (prevent recurrence), Long-term improvements (systemic changes)",
-                "example": "Immediate: Remove violating listings; Short-term: Update detection rules; Long-term: Enhance seller education program",
+                "description": "Preventative actions section inadequately addresses Hawkeye #12 requirements by failing to provide comprehensive, tiered response strategy. Current approach lacks specificity and measurable outcomes, reducing effectiveness of prevention efforts.",
+                "suggestion": "Develop comprehensive prevention strategy with: 1) Immediate actions with specific timelines and owners, 2) Short-term fixes addressing direct causes with success metrics, 3) Long-term systemic improvements targeting root causes, 4) Monitoring and measurement plans, 5) Contingency procedures for similar future issues",
+                "example": "Preventative Action Plan:\n\nIMMEDIATE (0-24 hours):\n• Remove all violating listings [Owner: Team X, Complete by: Date]\n• Notify affected customers [Owner: Team Y, Template: Link]\n• Implement temporary detection rule [Owner: Team Z]\n\nSHORT-TERM (1-4 weeks):\n• Update detection algorithm with new keywords [Success metric: 95% catch rate]\n• Enhance seller education materials [Metric: Completion rate]\n• Implement additional review checkpoints [Metric: Error reduction]\n\nLONG-TERM (1-6 months):\n• Integrate policy-detection system [Metric: Real-time sync]\n• Develop predictive risk modeling [Metric: Proactive detection]\n• Establish continuous monitoring dashboard [Metric: Response time]",
                 "questions": [
                     "What immediate actions prevent further harm?",
                     "How do we prevent this specific issue from recurring?",
@@ -602,9 +602,9 @@ def generate_contextual_feedback(section_name, content):
                 "id": f"inv_1_{hash(content) % 1000}",
                 "type": "important",
                 "category": "Investigation Process",
-                "description": "Investigation process should demonstrate adherence to SOPs while showing critical thinking and challenge of standard procedures when appropriate",
-                "suggestion": "Document which SOPs were followed, any deviations made, and rationale for investigative decisions",
-                "example": "Followed SOP-123 for initial assessment, deviated at step 5 due to unique circumstances, consulted with [team] for guidance",
+                "description": "Investigation process documentation fails to meet Hawkeye #2 standards by not adequately demonstrating SOP adherence, critical thinking, or decision-making rationale. This creates audit risks and reduces investigation credibility.",
+                "suggestion": "Provide comprehensive investigation documentation including: 1) Specific SOPs followed with version numbers, 2) Detailed rationale for any deviations, 3) Critical thinking examples where standard procedures were challenged, 4) Decision trees showing alternative approaches considered, 5) Consultation records with other teams, 6) Quality control checkpoints completed",
+                "example": "Investigation Methodology:\n\nSOPs Applied:\n• SOP-CT-001 v2.3: Initial Assessment [Completed: Date, Analyst: Name]\n• SOP-CT-015 v1.8: Evidence Collection [Deviation at Step 5 - See below]\n\nCritical Thinking Applied:\n• Standard procedure suggested [X], but unique circumstances [Y] required alternative approach\n• Challenged assumption [A] based on evidence [B], leading to discovery [C]\n\nDeviations & Rationale:\n• Step 5 of SOP-CT-015: Used [alternative method] instead of [standard method] because [specific technical/legal reason]\n• Consulted with [Team/Expert] who confirmed approach validity\n\nQuality Controls:\n• Peer review completed by [Name] on [Date]\n• Supervisor approval obtained for deviations\n• Documentation audit trail maintained"
                 "questions": [
                     "Which SOPs were followed?",
                     "Were any standard procedures challenged or modified?",
