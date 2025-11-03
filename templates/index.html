@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CT Review Tool - Hawkeye AI Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #3498db;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .header-gradient {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .stats-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+        }
+
+        .document-panel, .feedback-panel {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            height: 600px;
+            overflow-y: auto;
+        }
+
+        .panel-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 15px;
+            border-radius: 10px 10px 0 0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .feedback-item {
+            margin: 15px;
+            padding: 15px;
+            border-left: 4px solid;
+            background: #f8f9ff;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .feedback-item.critical { border-left-color: var(--danger-color); }
+        .feedback-item.important { border-left-color: var(--warning-color); }
+        .feedback-item.suggestion { border-left-color: var(--info-color); }
+        .feedback-item.positive { border-left-color: var(--success-color); }
+
+        .risk-badge {
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            color: white;
+            margin-left: 10px;
+        }
+
+        .risk-high { background-color: var(--danger-color); }
+        .risk-medium { background-color: var(--warning-color); }
+        .risk-low { background-color: var(--info-color); }
+
+        .hawkeye-ref {
+            background: #e3f2fd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-right: 5px;
+            font-size: 11px;
+        }
+
+        .chat-container {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #f9f9f9;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .chat-message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .chat-user {
+            background: #f5f5f5;
+            text-align: right;
+        }
+
+        .chat-assistant {
+            background: #e3f2fd;
+        }
+
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            background: white;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #e3f2fd;
+        }
+
+        .btn-gradient {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+        }
+
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            color: white;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .section-nav {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .custom-feedback-form {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px;
+        }
+
+        .status-accepted { color: var(--success-color); }
+        .status-rejected { color: var(--danger-color); }
+
+        @media (max-width: 768px) {
+            .document-panel, .feedback-panel {
+                height: 400px;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <!-- Header -->
+        <div class="header-gradient">
+            <h1 class="mb-2"><i class="fas fa-file-alt"></i> CT Review Tool</h1>
+            <p class="mb-0">AI-Powered Document Review with 20-Point Hawkeye Investigation Framework</p>
+        </div>
+
+        <!-- Upload Area -->
+        <div id="uploadSection">
+            <div class="upload-area" id="uploadArea">
+                <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                <h4>Upload Word Document (.docx)</h4>
+                <p class="text-muted">Drag and drop your document here or click to browse</p>
+                <input type="file" id="fileInput" accept=".docx" style="display: none;">
+                <button class="btn btn-gradient btn-lg" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-folder-open"></i> Choose File
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Processing document with Hawkeye framework...</p>
+        </div>
+
+        <!-- Main Interface -->
+        <div id="mainInterface" style="display: none;">
+            <!-- Stats Panel -->
+            <div class="stats-panel">
+                <div class="row" id="statsContainer">
+                    <div class="col stat-item">
+                        <div class="stat-number text-primary" id="totalFeedback">0</div>
+                        <div class="stat-label">Total Feedback</div>
+                    </div>
+                    <div class="col stat-item">
+                        <div class="stat-number text-danger" id="highRisk">0</div>
+                        <div class="stat-label">High Risk</div>
+                    </div>
+                    <div class="col stat-item">
+                        <div class="stat-number text-warning" id="mediumRisk">0</div>
+                        <div class="stat-label">Medium Risk</div>
+                    </div>
+                    <div class="col stat-item">
+                        <div class="stat-number text-success" id="accepted">0</div>
+                        <div class="stat-label">Accepted</div>
+                    </div>
+                    <div class="col stat-item">
+                        <div class="stat-number text-info" id="userAdded">0</div>
+                        <div class="stat-label">User Added</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Navigation -->
+            <div class="section-nav">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <label for="sectionSelect" class="form-label">Current Section:</label>
+                        <select class="form-select" id="sectionSelect">
+                            <option value="">Select a section...</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <div id="riskIndicator" class="mt-2"></div>
+                    </div>
+                    <div class="col-md-3 text-end">
+                        <button class="btn btn-warning" id="completeReviewBtn" disabled>
+                            <i class="fas fa-check-circle"></i> Complete Review
+                        </button>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col">
+                        <div class="progress">
+                            <div class="progress-bar bg-primary" id="progressBar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="row">
+                <!-- Document Panel -->
+                <div class="col-lg-6">
+                    <div class="document-panel">
+                        <div class="panel-header">
+                            <h4 class="mb-1"><i class="fas fa-file-text"></i> Original Document</h4>
+                            <small>Section: <span id="currentSectionName">-</span></small>
+                        </div>
+                        <div class="p-3">
+                            <div id="documentContent" style="white-space: pre-wrap; line-height: 1.8;">
+                                Select a section to view content...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback Panel -->
+                <div class="col-lg-6">
+                    <!-- Tabs -->
+                    <ul class="nav nav-tabs" id="rightPanelTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="feedback-tab" data-bs-toggle="tab" data-bs-target="#feedback" type="button" role="tab">
+                                <i class="fas fa-comments"></i> Feedback
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="chat-tab" data-bs-toggle="tab" data-bs-target="#chat" type="button" role="tab">
+                                <i class="fas fa-robot"></i> AI Chat
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="rightPanelContent">
+                        <!-- Feedback Tab -->
+                        <div class="tab-pane fade show active" id="feedback" role="tabpanel">
+                            <div class="feedback-panel">
+                                <div class="panel-header">
+                                    <h4 class="mb-1"><i class="fas fa-search"></i> Hawkeye AI Analysis</h4>
+                                    <small>Feedback based on 20-point investigation framework</small>
+                                </div>
+                                <div id="feedbackContainer">
+                                    <div class="text-center p-4">
+                                        <p class="text-muted">Select a section to view AI feedback</p>
+                                    </div>
+                                </div>
+
+                                <!-- Custom Feedback Form -->
+                                <div class="custom-feedback-form">
+                                    <h6><i class="fas fa-plus"></i> Add Custom Feedback</h6>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <select class="form-select form-select-sm" id="customType">
+                                                <option value="suggestion">Suggestion</option>
+                                                <option value="important">Important</option>
+                                                <option value="critical">Critical</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <select class="form-select form-select-sm" id="customCategory">
+                                                <option value="Initial Assessment">Initial Assessment</option>
+                                                <option value="Investigation Process">Investigation Process</option>
+                                                <option value="Seller Classification">Seller Classification</option>
+                                                <option value="Enforcement Decision-Making">Enforcement Decision-Making</option>
+                                                <option value="Additional Verification (High-Risk Cases)">Additional Verification</option>
+                                                <option value="Multiple Appeals Handling">Multiple Appeals Handling</option>
+                                                <option value="Account Hijacking Prevention">Account Hijacking Prevention</option>
+                                                <option value="Funds Management">Funds Management</option>
+                                                <option value="REs-Q Outreach Process">REs-Q Outreach Process</option>
+                                                <option value="Sentiment Analysis">Sentiment Analysis</option>
+                                                <option value="Root Cause Analysis">Root Cause Analysis</option>
+                                                <option value="Preventative Actions">Preventative Actions</option>
+                                                <option value="Documentation and Reporting">Documentation and Reporting</option>
+                                                <option value="Cross-Team Collaboration">Cross-Team Collaboration</option>
+                                                <option value="Quality Control">Quality Control</option>
+                                                <option value="Continuous Improvement">Continuous Improvement</option>
+                                                <option value="Communication Standards">Communication Standards</option>
+                                                <option value="Performance Metrics">Performance Metrics</option>
+                                                <option value="Legal and Compliance">Legal and Compliance</option>
+                                                <option value="New Service Launch Considerations">New Service Launch</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <textarea class="form-control form-control-sm" id="customDescription" rows="3" placeholder="Enter your feedback..."></textarea>
+                                    </div>
+                                    <div class="mt-2">
+                                        <button class="btn btn-info btn-sm" id="addCustomBtn">
+                                            <i class="fas fa-plus"></i> Add Feedback
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Navigation -->
+                                <div class="p-3 border-top">
+                                    <div class="row">
+                                        <div class="col">
+                                            <button class="btn btn-outline-primary" id="prevSectionBtn" disabled>
+                                                <i class="fas fa-chevron-left"></i> Previous
+                                            </button>
+                                        </div>
+                                        <div class="col text-end">
+                                            <button class="btn btn-outline-primary" id="nextSectionBtn" disabled>
+                                                Next <i class="fas fa-chevron-right"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chat Tab -->
+                        <div class="tab-pane fade" id="chat" role="tabpanel">
+                            <div class="feedback-panel">
+                                <div class="panel-header">
+                                    <h4 class="mb-1"><i class="fas fa-robot"></i> AI Assistant</h4>
+                                    <small>Ask questions about feedback or Hawkeye guidelines</small>
+                                </div>
+                                <div class="chat-container" id="chatContainer">
+                                    <div class="chat-message chat-assistant">
+                                        <strong><i class="fas fa-robot"></i> AI Assistant:</strong><br>
+                                        Hello! I'm here to help you with the document review. You can ask me about:<br>
+                                        • Specific feedback items<br>
+                                        • Hawkeye guidelines and checkpoints<br>
+                                        • How to improve sections<br>
+                                        • Risk classifications<br><br>
+                                        What would you like to know?
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="chatInput" placeholder="Ask about feedback, Hawkeye guidelines, or the document...">
+                                    <button class="btn btn-primary" id="chatSubmitBtn">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Log -->
+        <div class="mt-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-list"></i> Status Log</h5>
+                </div>
+                <div class="card-body">
+                    <div id="statusLog" style="max-height: 200px; overflow-y: auto;">
+                        <p class="text-muted">🚀 System ready. Upload a Word document to begin Hawkeye review.</p>
+                        <p class="text-muted">📋 The system will analyze based on the 20-point investigation checklist.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        let sessionId = null;
+        let sections = [];
+        let currentSectionIndex = 0;
+        let currentSectionFeedback = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // File upload
+            const fileInput = document.getElementById('fileInput');
+            const uploadArea = document.getElementById('uploadArea');
+
+            fileInput.addEventListener('change', handleFileUpload);
+            
+            // Drag and drop
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    handleFileUpload();
+                }
+            });
+
+            // Section navigation
+            document.getElementById('sectionSelect').addEventListener('change', handleSectionChange);
+            document.getElementById('prevSectionBtn').addEventListener('click', () => navigateSection(-1));
+            document.getElementById('nextSectionBtn').addEventListener('click', () => navigateSection(1));
+
+            // Custom feedback
+            document.getElementById('addCustomBtn').addEventListener('click', addCustomFeedback);
+
+            // Chat
+            document.getElementById('chatSubmitBtn').addEventListener('click', sendChatMessage);
+            document.getElementById('chatInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendChatMessage();
+            });
+
+            // Complete review
+            document.getElementById('completeReviewBtn').addEventListener('click', completeReview);
+        }
+
+        function handleFileUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) return;
+
+            if (!file.name.toLowerCase().endsWith('.docx')) {
+                addStatusLog('❌ Please select a valid Word document (.docx)', 'danger');
+                return;
+            }
+
+            showLoading(true);
+            addStatusLog(`📄 Processing: ${file.name}`, 'info');
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    sessionId = data.session_id;
+                    sections = data.sections;
+                    
+                    initializeInterface(data);
+                    addStatusLog(`✅ Document loaded successfully`, 'success');
+                    addStatusLog(`📊 Found ${sections.length} sections for review`, 'info');
+                } else {
+                    addStatusLog(`❌ Error: ${data.error}`, 'danger');
+                }
+            })
+            .catch(error => {
+                addStatusLog(`❌ Upload failed: ${error.message}`, 'danger');
+            })
+            .finally(() => {
+                showLoading(false);
+            });
+        }
+
+        function initializeInterface(data) {
+            // Show main interface
+            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('mainInterface').style.display = 'block';
+
+            // Populate section dropdown
+            const sectionSelect = document.getElementById('sectionSelect');
+            sectionSelect.innerHTML = '';
+            sections.forEach((section, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = section;
+                sectionSelect.appendChild(option);
+            });
+
+            // Load first section
+            if (sections.length > 0) {
+                currentSectionIndex = 0;
+                sectionSelect.value = 0;
+                loadSection(0);
+            }
+
+            // Enable complete review button
+            document.getElementById('completeReviewBtn').disabled = false;
+
+            // Update navigation
+            updateNavigation();
+            updateStats();
+        }
+
+        function loadSection(index) {
+            if (index < 0 || index >= sections.length) return;
+
+            currentSectionIndex = index;
+            const sectionName = sections[index];
+
+            // Update UI
+            document.getElementById('currentSectionName').textContent = sectionName;
+            document.getElementById('sectionSelect').value = index;
+
+            // Update progress
+            const progress = ((index + 1) / sections.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+
+            // Load section content
+            fetch('/get_section', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    section_name: sectionName
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.content) {
+                    document.getElementById('documentContent').textContent = data.content;
+                    analyzeSection(sectionName);
+                }
+            })
+            .catch(error => {
+                addStatusLog(`❌ Error loading section: ${error.message}`, 'danger');
+            });
+
+            updateNavigation();
+        }
+
+        function analyzeSection(sectionName) {
+            // Show loading in feedback container
+            const feedbackContainer = document.getElementById('feedbackContainer');
+            feedbackContainer.innerHTML = `
+                <div class="text-center p-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">🔍 Analyzing with Hawkeye Framework...</p>
+                </div>
+            `;
+
+            addStatusLog(`Analyzing ${sectionName} with Hawkeye checklist...`, 'info');
+
+            fetch('/analyze_section', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    section_name: sectionName
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                currentSectionFeedback = data.feedback_items || [];
+                displayFeedback(currentSectionFeedback, sectionName);
+                updateRiskIndicator(currentSectionFeedback);
+                updateStats();
+            })
+            .catch(error => {
+                feedbackContainer.innerHTML = `
+                    <div class="text-center p-4">
+                        <p class="text-danger">❌ Error analyzing section: ${error.message}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function displayFeedback(feedbackItems, sectionName) {
+            const container = document.getElementById('feedbackContainer');
+            
+            if (!feedbackItems || feedbackItems.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center p-4">
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i>
+                            No issues found in this section based on Hawkeye criteria
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            feedbackItems.forEach((item, index) => {
+                const riskClass = `risk-${item.risk_level?.toLowerCase() || 'low'}`;
+                const typeClass = item.type || 'suggestion';
+                
+                // Create Hawkeye references
+                let hawkeyeRefs = '';
+                if (item.hawkeye_refs && item.hawkeye_refs.length > 0) {
+                    hawkeyeRefs = item.hawkeye_refs.map(ref => 
+                        `<span class="hawkeye-ref">#${ref}</span>`
+                    ).join('');
+                }
+
+                // Create questions
+                let questionsHtml = '';
+                if (item.questions && item.questions.length > 0) {
+                    questionsHtml = `
+                        <div class="mt-2">
+                            <strong>Key Questions:</strong>
+                            <ul class="small mt-1">
+                                ${item.questions.map(q => `<li>${q}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }
+
+                html += `
+                    <div class="feedback-item ${typeClass}" data-index="${index}">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <strong class="text-uppercase">${item.type}</strong>
+                                <span class="risk-badge ${riskClass}">${item.risk_level || 'Low'} Risk</span>
+                                <small class="text-muted ms-2">${item.category || 'General'}</small>
+                            </div>
+                            <div class="feedback-actions">
+                                <button class="btn btn-success btn-sm me-1" onclick="acceptFeedback(${index}, '${sectionName}')">
+                                    <i class="fas fa-check"></i> Accept
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="rejectFeedback(${index}, '${sectionName}')">
+                                    <i class="fas fa-times"></i> Reject
+                                </button>
+                                <span class="feedback-status ms-2" id="status-${index}"></span>
+                            </div>
+                        </div>
+                        <p class="mb-2">${item.description}</p>
+                        ${item.suggestion ? `<p class="mb-2"><em><strong>Suggestion:</strong> ${item.suggestion}</em></p>` : ''}
+                        ${item.example ? `<p class="mb-2"><strong>Example:</strong> ${item.example}</p>` : ''}
+                        ${questionsHtml}
+                        <div class="mt-2">
+                            <strong>Hawkeye References:</strong> ${hawkeyeRefs}
+                        </div>
+                        <small class="text-muted">Confidence: ${Math.round((item.confidence || 0.8) * 100)}%</small>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function acceptFeedback(index, sectionName) {
+            const feedbackItem = currentSectionFeedback[index];
+            
+            fetch('/accept_feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    section_name: sectionName,
+                    feedback_item: feedbackItem
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update UI
+                    const statusElement = document.getElementById(`status-${index}`);
+                    statusElement.innerHTML = '<span class="status-accepted">✓ Accepted</span>';
+                    
+                    // Disable buttons
+                    const feedbackElement = document.querySelector(`[data-index="${index}"] .feedback-actions`);
+                    const buttons = feedbackElement.querySelectorAll('button');
+                    buttons.forEach(btn => btn.disabled = true);
+                    
+                    addStatusLog(`✓ Accepted feedback #${index + 1} for ${sectionName} - Will be added as comment`, 'success');
+                    updateStats();
+                }
+            })
+            .catch(error => {
+                addStatusLog(`❌ Error accepting feedback: ${error.message}`, 'danger');
+            });
+        }
+
+        function rejectFeedback(index, sectionName) {
+            const feedbackItem = currentSectionFeedback[index];
+            
+            fetch('/reject_feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    section_name: sectionName,
+                    feedback_item: feedbackItem
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update UI
+                    const statusElement = document.getElementById(`status-${index}`);
+                    statusElement.innerHTML = '<span class="status-rejected">✗ Rejected</span>';
+                    
+                    // Disable buttons
+                    const feedbackElement = document.querySelector(`[data-index="${index}"] .feedback-actions`);
+                    const buttons = feedbackElement.querySelectorAll('button');
+                    buttons.forEach(btn => btn.disabled = true);
+                    
+                    addStatusLog(`✗ Rejected feedback #${index + 1} for ${sectionName}`, 'info');
+                    updateStats();
+                }
+            })
+            .catch(error => {
+                addStatusLog(`❌ Error rejecting feedback: ${error.message}`, 'danger');
+            });
+        }
+
+        function addCustomFeedback() {
+            const type = document.getElementById('customType').value;
+            const category = document.getElementById('customCategory').value;
+            const description = document.getElementById('customDescription').value.trim();
+            
+            if (!description) {
+                addStatusLog('Please enter feedback description', 'warning');
+                return;
+            }
+
+            const sectionName = sections[currentSectionIndex];
+            
+            fetch('/add_custom_feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    section_name: sectionName,
+                    type: type,
+                    category: category,
+                    description: description
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Clear form
+                    document.getElementById('customDescription').value = '';
+                    
+                    // Add to current feedback and refresh display
+                    currentSectionFeedback.push(data.feedback);
+                    displayFeedback(currentSectionFeedback, sectionName);
+                    
+                    addStatusLog(`✓ Added custom feedback for ${sectionName}`, 'success');
+                    updateStats();
+                }
+            })
+            .catch(error => {
+                addStatusLog(`❌ Error adding custom feedback: ${error.message}`, 'danger');
+            });
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const query = input.value.trim();
+            
+            if (!query) return;
+
+            // Add user message to chat
+            addChatMessage('user', query);
+            input.value = '';
+
+            // Add thinking message
+            addChatMessage('assistant', '🤔 Thinking...', true);
+
+            const context = {
+                current_section: sections[currentSectionIndex]
+            };
+
+            fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    query: query,
+                    context: context
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Remove thinking message
+                const chatContainer = document.getElementById('chatContainer');
+                const thinkingMsg = chatContainer.querySelector('.thinking');
+                if (thinkingMsg) thinkingMsg.remove();
+
+                // Add response
+                addChatMessage('assistant', data.response);
+            })
+            .catch(error => {
+                // Remove thinking message
+                const chatContainer = document.getElementById('chatContainer');
+                const thinkingMsg = chatContainer.querySelector('.thinking');
+                if (thinkingMsg) thinkingMsg.remove();
+
+                addChatMessage('assistant', `Sorry, I encountered an error: ${error.message}`);
+            });
+        }
+
+        function addChatMessage(role, content, isThinking = false) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message chat-${role}`;
+            if (isThinking) messageDiv.classList.add('thinking');
+            
+            const icon = role === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+            const label = role === 'user' ? 'You' : 'AI Assistant';
+            
+            messageDiv.innerHTML = `<strong>${icon} ${label}:</strong><br>${content}`;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function completeReview() {
+            addStatusLog('🎯 Completing review...', 'info');
+            
+            fetch('/complete_review', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    session_id: sessionId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    addStatusLog('✅ Review completed successfully!', 'success');
+                    addStatusLog(`📄 Document created with ${data.comments_count} comments`, 'success');
+                    addStatusLog('💡 Comments have been added to the document.', 'info');
+                    addStatusLog('📌 Open in Microsoft Word to see comments in the margin.', 'info');
+                    
+                    // Create download link
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = `/download/${data.output_path}`;
+                    downloadLink.className = 'btn btn-success btn-sm ms-2';
+                    downloadLink.innerHTML = '<i class="fas fa-download"></i> Download';
+                    downloadLink.download = data.output_path;
+                    
+                    const statusLog = document.getElementById('statusLog');
+                    const downloadP = document.createElement('p');
+                    downloadP.innerHTML = '📄 Download: ';
+                    downloadP.appendChild(downloadLink);
+                    statusLog.appendChild(downloadP);
+                    
+                    // Update button
+                    const completeBtn = document.getElementById('completeReviewBtn');
+                    completeBtn.disabled = true;
+                    completeBtn.innerHTML = '<i class="fas fa-check"></i> Review Completed';
+                    completeBtn.className = 'btn btn-success';
+                } else {
+                    addStatusLog(`❌ Error: ${data.error}`, 'danger');
+                }
+            })
+            .catch(error => {
+                addStatusLog(`❌ Error completing review: ${error.message}`, 'danger');
+            });
+        }
+
+        function handleSectionChange() {
+            const select = document.getElementById('sectionSelect');
+            const index = parseInt(select.value);
+            if (!isNaN(index)) {
+                loadSection(index);
+            }
+        }
+
+        function navigateSection(direction) {
+            const newIndex = currentSectionIndex + direction;
+            if (newIndex >= 0 && newIndex < sections.length) {
+                loadSection(newIndex);
+            }
+        }
+
+        function updateNavigation() {
+            document.getElementById('prevSectionBtn').disabled = currentSectionIndex === 0;
+            document.getElementById('nextSectionBtn').disabled = currentSectionIndex >= sections.length - 1;
+        }
+
+        function updateRiskIndicator(feedbackItems) {
+            const highRisk = feedbackItems.filter(item => item.risk_level === 'High').length;
+            const mediumRisk = feedbackItems.filter(item => item.risk_level === 'Medium').length;
+            
+            const indicator = document.getElementById('riskIndicator');
+            
+            if (highRisk > 0) {
+                indicator.innerHTML = `<span class="badge bg-danger">⚠️ High Risk (${highRisk} issues)</span>`;
+            } else if (mediumRisk > 0) {
+                indicator.innerHTML = `<span class="badge bg-warning">⚠️ Medium Risk (${mediumRisk} issues)</span>`;
+            } else {
+                indicator.innerHTML = `<span class="badge bg-success">✓ Low Risk</span>`;
+            }
+        }
+
+        function updateStats() {
+            if (!sessionId) return;
+            
+            fetch('/get_stats', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    session_id: sessionId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('totalFeedback').textContent = data.total_feedback || 0;
+                document.getElementById('highRisk').textContent = data.high_risk || 0;
+                document.getElementById('mediumRisk').textContent = data.medium_risk || 0;
+                document.getElementById('accepted').textContent = data.accepted || 0;
+                document.getElementById('userAdded').textContent = data.user_added || 0;
+            })
+            .catch(error => {
+                console.error('Error updating stats:', error);
+            });
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
+        }
+
+        function addStatusLog(message, type = 'info') {
+            const statusLog = document.getElementById('statusLog');
+            const p = document.createElement('p');
+            p.className = `text-${type} mb-1`;
+            p.innerHTML = `<small>${new Date().toLocaleTimeString()}</small> ${message}`;
+            statusLog.appendChild(p);
+            statusLog.scrollTop = statusLog.scrollHeight;
+        }
+    </script>
+</body>
+</html>

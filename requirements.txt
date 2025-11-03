@@ -1,0 +1,8 @@
+Flask==2.3.3
+pandas==2.0.3
+python-docx==0.8.11
+lxml==4.9.3
+boto3==1.28.85
+Werkzeug==2.3.7
+uuid==1.30
+pathlib==1.0.1
