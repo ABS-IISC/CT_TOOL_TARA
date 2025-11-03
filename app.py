@@ -445,15 +445,30 @@ def generate_section_specific_response(user_prompt, operation_name):
     time.sleep(1)
     
     if "chat" in operation_name.lower():
-        # Extract question from user prompt for contextual chat responses
-        if "hawkeye" in user_prompt.lower():
-            return "The Hawkeye 20-point checklist is designed to ensure thorough investigation. Key areas include: 1) Customer Experience Impact, 2) Investigation Process, 3) Seller Classification, 4) Enforcement Decision-Making. Which specific checkpoint would you like me to explain?"
-        elif "risk" in user_prompt.lower():
-            return "Risk classification follows Hawkeye criteria: High Risk (counterfeit, fraud, health/safety), Medium Risk (policy violations, patterns), Low Risk (minor issues, clarifications). What risk level are you concerned about?"
-        elif "feedback" in user_prompt.lower():
-            return "The feedback is generated based on the specific content of each section against Hawkeye standards. Each item includes specific questions, suggestions, and references to relevant checkpoints. Would you like me to explain any particular feedback item?"
+        # Extract actual question from user prompt
+        question = user_prompt.lower()
+        
+        # Extract the actual user question from the prompt
+        if "user question:" in question:
+            question = question.split("user question:")[1].strip()
+        
+        # Provide specific responses based on question content
+        if "seller classification" in question or "good actor" in question or "bad actor" in question:
+            return "Seller Classification (Hawkeye #3): Good Actor = unintentional violation, cooperative response; Bad Actor = intentional abuse, non-cooperative; Confused Actor = misunderstands policies. Classification should be based on intent, history, and response to enforcement."
+        elif "hawkeye" in question and any(x in question for x in ["1", "one", "first", "initial"]):
+            return "Hawkeye #1 - Initial Assessment: Evaluate customer experience (CX) impact. Ask: How does this issue affect customer trust? What's the potential for negative reviews or returns? Always consider both immediate and long-term customer impact."
+        elif "risk" in question:
+            return "Risk Classification: High Risk = counterfeit, fraud, health/safety issues, bad actors; Medium Risk = policy violations with patterns, enforcement needed; Low Risk = isolated incidents, clarifications needed. Base classification on impact severity and scope."
+        elif "root cause" in question:
+            return "Root Cause Analysis (Hawkeye #11): Use 5 Whys technique. Identify process gaps, system failures, policy ambiguities. Distinguish immediate vs systemic causes. Ask: What allowed this to happen? Could better processes prevent it?"
+        elif "preventative" in question or "prevention" in question:
+            return "Preventative Actions (Hawkeye #12): Structure as Immediate (stop current harm), Short-term (prevent recurrence), Long-term (systemic improvements). Address root causes identified in analysis."
+        elif "investigation" in question:
+            return "Investigation Process (Hawkeye #2): Follow SOPs but challenge when needed. Document methodology, evidence, decisions. Show critical thinking. Which SOPs were used? Any deviations and why?"
+        elif "feedback" in question:
+            return "The feedback analyzes your specific section content against Hawkeye standards. Each item includes targeted questions, actionable suggestions, and relevant checkpoint references. What specific feedback would you like me to explain?"
         else:
-            return f"I can help you with questions about the current section, Hawkeye guidelines, risk assessment, or feedback interpretation. What would you like to know more about?"
+            return f"I'm TARA, your CT review assistant. I can help with: Hawkeye checkpoints (#1-20), seller classification, risk assessment, investigation best practices, or specific feedback items. What would you like to know?"
     
     # Extract section name and content for analysis
     section_name = "Unknown Section"

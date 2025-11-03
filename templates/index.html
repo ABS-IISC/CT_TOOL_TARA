@@ -433,7 +433,7 @@
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="chat-tab" data-bs-toggle="tab" data-bs-target="#chat" type="button" role="tab">
-                                <i class="fas fa-robot"></i> AI Chat
+                                <i class="fas fa-robot"></i> TARA Chat
                             </button>
                         </li>
                     </ul>
@@ -520,22 +520,23 @@
                         <div class="tab-pane fade" id="chat" role="tabpanel">
                             <div class="feedback-panel">
                                 <div class="panel-header">
-                                    <h4 class="mb-1"><i class="fas fa-robot"></i> AI Assistant</h4>
+                                    <h4 class="mb-1"><i class="fas fa-robot"></i> TARA Assistant</h4>
                                     <small>Ask questions about feedback or Hawkeye guidelines</small>
                                 </div>
                                 <div class="chat-container" id="chatContainer">
                                     <div class="chat-message chat-assistant">
-                                        <strong><i class="fas fa-robot"></i> AI Assistant:</strong><br>
-                                        Hello! I'm here to help you with the document review. You can ask me about:<br>
-                                        • Specific feedback items<br>
-                                        • Hawkeye guidelines and checkpoints<br>
-                                        • How to improve sections<br>
-                                        • Risk classifications<br><br>
+                                        <strong><i class="fas fa-robot"></i> TARA:</strong><br>
+                                        Hello! I'm TARA, your CT review assistant. I can help you with:<br>
+                                        • Hawkeye guidelines and checkpoints (#1-20)<br>
+                                        • Seller classification (Good/Bad/Confused Actor)<br>
+                                        • Risk assessment and classification<br>
+                                        • Investigation best practices<br>
+                                        • Specific feedback explanations<br><br>
                                         What would you like to know?
                                     </div>
                                 </div>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="chatInput" placeholder="Ask about feedback, Hawkeye guidelines, or the document...">
+                                    <input type="text" class="form-control" id="chatInput" placeholder="Ask TARA about Hawkeye guidelines, seller classification, risk levels...">
                                     <button class="btn btn-primary" id="chatSubmitBtn">
                                         <i class="fas fa-paper-plane"></i>
                                     </button>
@@ -1005,7 +1006,7 @@
             if (isThinking) messageDiv.classList.add('thinking');
             
             const icon = role === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
-            const label = role === 'user' ? 'You' : 'AI Assistant';
+            const label = role === 'user' ? 'You' : 'TARA';
             
             messageDiv.innerHTML = `<strong>${icon} ${label}:</strong><br>${content}`;
             chatContainer.appendChild(messageDiv);
