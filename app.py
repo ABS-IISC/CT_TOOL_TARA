@@ -26,7 +26,7 @@ from werkzeug.utils import secure_filename
 import tempfile
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-here'  # Change this in production
+app.secret_key = os.environ.get('SECRET_KEY', 'ct-review-tool-secret-key-2024')
 
 # Configuration
 UPLOAD_FOLDER = 'uploads'
@@ -1134,31 +1134,70 @@ def add_custom_feedback():
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    data = request.json
-    session_id = data.get('session_id')
-    query = data.get('query')
-    context = data.get('context', {})
+    try:
+        data = request.json
+        session_id = data.get('session_id')
+        query = data.get('query', '').strip()
+        context = data.get('context', {})
+        
+        if not session_id or session_id not in document_sessions:
+            return jsonify({'error': 'Invalid session'}), 400
+        
+        if not query:
+            return jsonify({'response': 'Please ask a question about the document or Hawkeye guidelines.'})
+        
+        review_session = document_sessions[session_id]
+        
+        # Direct chat response
+        response = get_direct_chat_response(query)
+        
+        # Store chat history
+        review_session.chat_history.append({
+            'role': 'user',
+            'content': query,
+            'timestamp': datetime.now().isoformat()
+        })
+        review_session.chat_history.append({
+            'role': 'assistant',
+            'content': response,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+        return jsonify({'response': response})
+        
+    except Exception as e:
+        return jsonify({'response': f'I encountered an error. Please try asking your question again.'})
+
+def get_direct_chat_response(query):
+    """Get direct chat response"""
+    query_lower = query.lower()
     
-    if not session_id or session_id not in document_sessions:
-        return jsonify({'error': 'Invalid session'}), 400
+    if any(term in query_lower for term in ['seller classification', 'good actor', 'bad actor']):
+        return "Seller Classification (Hawkeye #3): Good Actor = unintentional violation, cooperative response; Bad Actor = intentional abuse, non-cooperative; Confused Actor = misunderstands policies. Classification based on intent, history, and response to enforcement."
     
-    review_session = document_sessions[session_id]
+    elif any(term in query_lower for term in ['hawkeye 1', 'initial assessment', 'customer experience']):
+        return "Hawkeye #1 - Initial Assessment: Evaluate customer experience (CX) impact. Ask: How does this issue affect customer trust? What's the potential for negative reviews or returns? Always consider both immediate and long-term customer impact."
     
-    response = process_chat_query(query, context, session_id)
+    elif 'risk' in query_lower:
+        return "Risk Classification: High Risk = counterfeit, fraud, health/safety issues; Medium Risk = policy violations with patterns; Low Risk = isolated incidents, clarifications needed. Base classification on impact severity and scope."
     
-    # Store chat history
-    review_session.chat_history.append({
-        'role': 'user',
-        'content': query,
-        'timestamp': datetime.now().isoformat()
-    })
-    review_session.chat_history.append({
-        'role': 'assistant',
-        'content': response,
-        'timestamp': datetime.now().isoformat()
-    })
+    elif 'root cause' in query_lower:
+        return "Root Cause Analysis (Hawkeye #11): Use 5 Whys technique. Identify process gaps, system failures, policy ambiguities. Distinguish immediate vs systemic causes."
     
-    return jsonify({'response': response})
+    elif any(term in query_lower for term in ['preventative', 'prevention']):
+        return "Preventative Actions (Hawkeye #12): Structure as Immediate (stop current harm), Short-term (prevent recurrence), Long-term (systemic improvements)."
+    
+    elif 'investigation' in query_lower:
+        return "Investigation Process (Hawkeye #2): Follow SOPs but challenge when needed. Document methodology, evidence, decisions. Show critical thinking."
+    
+    elif 'feedback' in query_lower:
+        return "The feedback analyzes your specific section content against Hawkeye standards. Each item includes targeted questions, actionable suggestions, and relevant checkpoint references."
+    
+    elif 'hawkeye' in query_lower:
+        return "The Hawkeye 20-point checklist ensures thorough investigation. Key areas: 1) Customer Experience Impact, 2) Investigation Process, 3) Seller Classification, 4) Enforcement Decision-Making. Which checkpoint would you like me to explain?"
+    
+    else:
+        return "I'm TARA, your CT review assistant. I can help with: Hawkeye checkpoints (#1-20), seller classification, risk assessment, investigation best practices, or specific feedback items. What would you like to know?"
 
 @app.route('/complete_review', methods=['POST'])
 def complete_review():
