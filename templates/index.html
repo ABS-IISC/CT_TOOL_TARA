@@ -10,21 +10,25 @@
     <style>
         :root {
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --danger-color: #e74c3c;
-            --info-color: #3498db;
-            --dark-bg: #2c3e50;
-            --light-bg: #ecf0f1;
-            --card-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            --hover-shadow: 0 12px 35px rgba(0,0,0,0.15);
+            --success-color: #00d4aa;
+            --warning-color: #ffa726;
+            --danger-color: #ff5252;
+            --info-color: #42a5f5;
+            --dark-bg: #1e1e2e;
+            --darker-bg: #181825;
+            --card-bg: rgba(30, 30, 46, 0.8);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #cdd6f4;
+            --text-secondary: #a6adc8;
+            --card-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            --hover-shadow: 0 12px 40px rgba(0,0,0,0.6);
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #11111b 0%, #1e1e2e 50%, #313244 100%);
             min-height: 100vh;
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #2c3e50;
+            color: var(--text-primary);
         }
 
         .header-gradient {
@@ -66,19 +70,32 @@
 
         .stat-item {
             text-align: center;
-            padding: 10px;
+            padding: 15px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .stat-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
         }
 
         .stat-number {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 700;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            color: var(--text-primary);
         }
 
         .stat-label {
-            font-size: 12px;
-            color: #7f8c8d;
+            font-size: 11px;
+            color: var(--text-secondary);
             text-transform: uppercase;
+            font-weight: 500;
+            letter-spacing: 0.5px;
         }
 
         .document-panel, .feedback-panel {
@@ -347,7 +364,34 @@
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
-            <p class="mt-2">Processing document with Hawkeye framework...</p>
+            <p class="mt-2" style="color: var(--text-primary);">Processing document with Hawkeye framework...</p>
+            <div class="progress-details" id="progressDetails" style="display: none;">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span style="color: var(--text-secondary);">Processing Progress</span>
+                        <span style="color: var(--text-secondary);" id="loadingPercent">0%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" id="loadingProgressBar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="progress-step" id="step1">
+                    <i class="fas fa-circle"></i>
+                    <span>Extracting document sections...</span>
+                </div>
+                <div class="progress-step" id="step2">
+                    <i class="fas fa-circle"></i>
+                    <span>Analyzing with Hawkeye framework...</span>
+                </div>
+                <div class="progress-step" id="step3">
+                    <i class="fas fa-circle"></i>
+                    <span>Generating feedback...</span>
+                </div>
+                <div class="progress-step" id="step4">
+                    <i class="fas fa-circle"></i>
+                    <span>Ready for review</span>
+                </div>
+            </div>
         </div>
 
         <!-- Main Interface -->
@@ -355,24 +399,24 @@
             <!-- Stats Panel -->
             <div class="stats-panel">
                 <div class="row" id="statsContainer">
-                    <div class="col stat-item">
-                        <div class="stat-number text-primary" id="totalFeedback">0</div>
+                    <div class="col stat-item" onclick="showStatDetails('total')">
+                        <div class="stat-number" id="totalFeedback">0</div>
                         <div class="stat-label">Total Feedback</div>
                     </div>
-                    <div class="col stat-item">
-                        <div class="stat-number text-danger" id="highRisk">0</div>
+                    <div class="col stat-item" onclick="showStatDetails('high')">
+                        <div class="stat-number" id="highRisk" style="color: var(--danger-color);">0</div>
                         <div class="stat-label">High Risk</div>
                     </div>
-                    <div class="col stat-item">
-                        <div class="stat-number text-warning" id="mediumRisk">0</div>
+                    <div class="col stat-item" onclick="showStatDetails('medium')">
+                        <div class="stat-number" id="mediumRisk" style="color: var(--warning-color);">0</div>
                         <div class="stat-label">Medium Risk</div>
                     </div>
-                    <div class="col stat-item">
-                        <div class="stat-number text-success" id="accepted">0</div>
+                    <div class="col stat-item" onclick="showStatDetails('accepted')">
+                        <div class="stat-number" id="accepted" style="color: var(--success-color);">0</div>
                         <div class="stat-label">Accepted</div>
                     </div>
-                    <div class="col stat-item">
-                        <div class="stat-number text-info" id="userAdded">0</div>
+                    <div class="col stat-item" onclick="showStatDetails('user')">
+                        <div class="stat-number" id="userAdded" style="color: var(--info-color);">0</div>
                         <div class="stat-label">User Added</div>
                     </div>
                 </div>
@@ -1118,6 +1162,107 @@
 
         function showLoading(show) {
             document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
+            if (show) {
+                document.getElementById('progressDetails').style.display = 'block';
+                simulateProgress();
+            } else {
+                document.getElementById('progressDetails').style.display = 'none';
+            }
+        }
+        
+        function simulateProgress() {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 100) progress = 100;
+                
+                document.getElementById('loadingProgressBar').style.width = progress + '%';
+                document.getElementById('loadingPercent').textContent = Math.round(progress) + '%';
+                
+                // Update steps
+                if (progress > 25) updateStep(1, 'completed');
+                if (progress > 50) updateStep(2, 'active');
+                if (progress > 75) updateStep(3, 'active');
+                if (progress >= 100) {
+                    updateStep(4, 'completed');
+                    clearInterval(interval);
+                }
+            }, 200);
+        }
+        
+        function updateStep(stepNum, status) {
+            const step = document.getElementById(`step${stepNum}`);
+            const icon = step.querySelector('i');
+            
+            step.classList.remove('active', 'completed');
+            step.classList.add(status);
+            
+            if (status === 'active') {
+                icon.className = 'fas fa-spinner fa-spin';
+            } else if (status === 'completed') {
+                icon.className = 'fas fa-check-circle';
+            }
+        }
+        
+        function showStatDetails(statType) {
+            switch(statType) {
+                case 'high':
+                    addStatusLog('🔍 Showing high-risk feedback items', 'danger');
+                    highlightFeedbackByRisk('High');
+                    break;
+                case 'medium':
+                    addStatusLog('🔍 Showing medium-risk feedback items', 'warning');
+                    highlightFeedbackByRisk('Medium');
+                    break;
+                case 'accepted':
+                    addStatusLog('✅ Showing accepted feedback items', 'success');
+                    showAcceptedFeedback();
+                    break;
+                case 'user':
+                    addStatusLog('👤 Showing user-added feedback items', 'info');
+                    break;
+                default:
+                    addStatusLog('📊 Showing all feedback items', 'info');
+            }
+        }
+        
+        function highlightFeedbackByRisk(riskLevel) {
+            const feedbackItems = document.querySelectorAll('.feedback-item');
+            feedbackItems.forEach(item => {
+                const riskBadge = item.querySelector('.risk-badge');
+                if (riskBadge && riskBadge.textContent.includes(riskLevel)) {
+                    item.style.border = '2px solid var(--warning-color)';
+                    item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    item.style.opacity = '0.5';
+                }
+            });
+            
+            setTimeout(() => {
+                feedbackItems.forEach(item => {
+                    item.style.border = '';
+                    item.style.opacity = '';
+                });
+            }, 3000);
+        }
+        
+        function showAcceptedFeedback() {
+            const feedbackItems = document.querySelectorAll('.feedback-item');
+            feedbackItems.forEach(item => {
+                const statusElement = item.querySelector('.feedback-status');
+                if (statusElement && statusElement.textContent.includes('Accepted')) {
+                    item.style.border = '2px solid var(--success-color)';
+                } else {
+                    item.style.opacity = '0.5';
+                }
+            });
+            
+            setTimeout(() => {
+                feedbackItems.forEach(item => {
+                    item.style.border = '';
+                    item.style.opacity = '';
+                });
+            }, 3000);
         }
 
         function addStatusLog(message, type = 'info') {
