@@ -10,8 +10,11 @@ from app import app
 
 if __name__ == '__main__':
     # Create necessary directories
-    os.makedirs('uploads', exist_ok=True)
-    os.makedirs('outputs', exist_ok=True)
+    try:
+        os.makedirs('uploads', exist_ok=True)
+        os.makedirs('outputs', exist_ok=True)
+    except Exception as e:
+        print(f"Warning: Could not create directories: {e}")
     
     # Get port from environment (Railway, Heroku) or default to 5000
     port = int(os.environ.get('PORT', 5000))
