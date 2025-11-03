@@ -13,17 +13,20 @@ if __name__ == '__main__':
     os.makedirs('uploads', exist_ok=True)
     os.makedirs('outputs', exist_ok=True)
     
+    # Get port from environment (Railway, Heroku) or default to 5000
+    port = int(os.environ.get('PORT', 5000))
+    
     # Set environment variables for production
     if len(sys.argv) > 1 and sys.argv[1] == 'production':
         app.config['DEBUG'] = False
         app.config['ENV'] = 'production'
         print("Starting CT Review Tool in PRODUCTION mode...")
-        print("Access the application at: http://localhost:5000")
-        app.run(host='0.0.0.0', port=5000, debug=False)
+        print(f"Access the application at: http://localhost:{port}")
+        app.run(host='0.0.0.0', port=port, debug=False)
     else:
         app.config['DEBUG'] = True
         app.config['ENV'] = 'development'
         print("Starting CT Review Tool in DEVELOPMENT mode...")
-        print("Access the application at: http://localhost:5000")
+        print(f"Access the application at: http://localhost:{port}")
         print("Debug mode is enabled - changes will auto-reload")
-        app.run(host='0.0.0.0', port=5000, debug=True)
+        app.run(host='0.0.0.0', port=port, debug=True)
